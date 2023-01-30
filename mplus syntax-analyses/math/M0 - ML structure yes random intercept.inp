@@ -1,0 +1,45 @@
+TITLE:
+	MODEL 0 only ML structure, yes random intercept at the between levels
+	
+DATA:
+FILE = 	list.dat;
+TYPE =	IMPUTATION;
+
+VARIABLE: 
+NAMES =   CNTRYID CNTSCHID OECD CNTSTUID CULTPOSS GENERAL GRADE INCOME ISCEDO
+          ISEI_F ISEI_HI ISEI_M PARED P_WEALTH REPEAT age female skip_class
+          skip_school PVMATH PVREAD PVSCIE proportion_q1 NATIVE stu_ACCESS stu_SKILL
+          stu_EFFIC stu_GAME stu_SOCIAL stu_INFO ACCxSES SKIxSES EFFxSES GAMxSES
+          SOCxSES INFxSES TRUANT Z_WEALTH WEALTH_z;
+
+
+USEOBSERVATIONS = ;
+
+USEVAR =  CNTRYID CNTSCHID 
+          PARED stu_ACCESS stu_SKILL stu_EFFIC stu_GAME stu_SOCIAL stu_INFO
+          PVMATH;
+
+CLUSTER = CNTRYID CNTSCHID;
+
+WITHIN = PARED stu_ACCESS stu_SKILL stu_EFFIC stu_GAME stu_SOCIAL stu_INFO;
+
+
+MISSING = all (-9999);
+
+ANALYSIS:
+	ESTIMATOR= ML;
+    TYPE = THREELEVEL;
+    ALGORITHM = EM;
+	
+MODEL:
+    %WITHIN%
+    PVMATH;
+
+    %BETWEEN CNTSCHID%
+    PVMATH;
+
+    %BETWEEN CNTRYID%
+    PVMATH;
+ 	
+OUTPUT:	
+	STDYX;

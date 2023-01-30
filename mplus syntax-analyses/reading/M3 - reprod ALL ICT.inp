@@ -1,0 +1,79 @@
+TITLE:
+	MODEL 4 REPRODUCTION MODEL
+
+DATA:
+FILE = 	list.dat;
+TYPE =	IMPUTATION;
+
+VARIABLE: 
+NAMES =   CNTRYID CNTSCHID OECD CNTSTUID CULTPOSS GENERAL GRADE INCOME ISCEDO
+          ISEI_F ISEI_HI ISEI_M PARED P_WEALTH REPEAT age female skip_class
+          skip_school PVMATH PVREAD PVSCIE proportion_q1 NATIVE stu_ACCESS stu_SKILL
+          stu_EFFIC stu_GAME stu_SOCIAL stu_INFO ACCxSES SKIxSES EFFxSES GAMxSES
+          SOCxSES INFxSES TRUANT Z_WEALTH WEALTH_z;
+
+
+USEOBSERVATIONS = ;
+
+USEVAR =  CNTRYID CNTSCHID female age GRADE REPEAT GENERAL 
+          PARED stu_ACCESS stu_SKILL stu_EFFIC stu_GAME stu_SOCIAL stu_INFO
+          PVREAD;
+
+CLUSTER = CNTRYID CNTSCHID;
+
+WITHIN = PARED stu_ACCESS stu_SKILL stu_EFFIC stu_GAME stu_SOCIAL stu_INFO
+         female age GRADE REPEAT GENERAL;
+
+MISSING = all (-9999);
+
+ANALYSIS:
+	ESTIMATOR= ML;
+    TYPE = THREELEVEL ;
+    ALGORITHM = ;
+	
+MODEL:
+    %WITHIN%
+    PVREAD;
+    PVREAD ON PARED female age GRADE REPEAT GENERAL;
+
+    PVREAD ON stu_ACCESS(a); 
+    PVREAD ON stu_SKILL (b); 
+    PVREAD ON stu_EFFIC (c);
+    PVREAD on stu_INFO (d);
+    PVREAD ON stu_SOCIAL (e);
+    PVREAD ON stu_GAME(f);
+
+    stu_ACCESS ON PARED (b1);
+    stu_ACCESS ON female age GRADE REPEAT GENERAL;
+
+    stu_SKILL ON PARED (b2);
+    stu_SKILL ON female age GRADE REPEAT GENERAL;
+
+    stu_EFFIC ON PARED (b3);
+    stu_EFFIC ON female age GRADE REPEAT GENERAL;
+
+    stu_INFO ON PARED (b4);
+    stu_INFO ON female age GRADE REPEAT GENERAL;
+
+    stu_SOCIAL ON PARED (b5);
+    stu_SOCIAL ON female age GRADE REPEAT GENERAL;
+
+    stu_GAME ON PARED (b6);
+    stu_GAME ON female age GRADE REPEAT GENERAL;
+    stu_ACCESS WITH stu_SKILL stu_EFFIC stu_GAME stu_SOCIAL stu_INFO;
+    stu_SKILL WITH stu_EFFIC stu_GAME stu_SOCIAL stu_INFO;
+    stu_EFFIC WITH stu_GAME stu_SOCIAL stu_INFO;
+    stu_GAME WITH stu_SOCIAL stu_INFO;
+    stu_SOCIAL WITH stu_INFO;
+
+    %BETWEEN CNTSCHID%
+    PVREAD;
+
+
+    %BETWEEN CNTRYID%
+    PVREAD;
+
+
+OUTPUT:	
+	STDYX;
+    SAMPSTAT;
